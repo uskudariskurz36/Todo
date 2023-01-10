@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 using Todo.API.Entities;
 using Todo.API.Models;
 
 namespace Todo.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class TodoController : ControllerBase
     {
