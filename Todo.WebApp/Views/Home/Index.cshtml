@@ -14,6 +14,11 @@
     </div>
 </div>
 
+@if (TempData["result"] != null)
+{
+    <div class="alert alert-info my-3">@TempData["result"]</div>
+}
+
 <div class="row">
     <div class="col">
         <table class="table table-bordered table-sm table-hover">

@@ -88,6 +88,24 @@ namespace Todo.WebApp.Controllers
             return View(model);
         }
 
+        public IActionResult Delete(int id)
+        {
+            RestRequest request = new RestRequest($"/Todo/Remove/{id}", Method.Delete);
+            RestResponse response = client.Execute(request);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                TempData["result"] = "Kayıt bulunamadı.";
+            }
+            else
+            {
+                TempData["result"] = "Kayıt silindi.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
         public IActionResult Privacy()
         {
             return View();
