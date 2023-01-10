@@ -21,7 +21,12 @@ namespace Todo.API.Controllers
             return Ok(_databaseContext.Todos.ToList());
         }
 
-
+        /// <summary>
+        /// Verileri sıralar ve beli adette çekmemizi sağlar.
+        /// </summary>
+        /// <param name="count">Adet. örn; 5</param>
+        /// <param name="order">Sıralama. örn; "asc" ya da "desc"</param>
+        /// <returns></returns>
         [HttpGet("{count}/{order}")]
         public IActionResult List(int count, string order)
         {
