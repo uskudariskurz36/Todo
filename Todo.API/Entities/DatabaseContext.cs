@@ -11,6 +11,11 @@ namespace Todo.API.Entities
         {
             _configuration = configuration;
 
+            if (Database.GetPendingMigrations().Count() > 0)
+            {
+                Database.Migrate();
+            }
+
             if (Database.CanConnect())
             {
                 if (Todos.Any() == false)
