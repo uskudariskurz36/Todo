@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Todo.API.Entities;
 
 namespace Todo.API
@@ -20,6 +23,23 @@ namespace Todo.API
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
+
+            string secretKey = builder.Configuration.GetValue<string>("Authentication:SecretKey");
+
+            builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = false,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    };
+                });
+
 
             var app = builder.Build();
 
