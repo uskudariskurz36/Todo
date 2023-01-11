@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,6 +8,7 @@ using System.Text;
 
 namespace Todo.API.Controllers
 {
+    [Authorize]
     [Route("[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -18,6 +20,7 @@ namespace Todo.API.Controllers
             _configuration = configuration;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult SignIn()
         {

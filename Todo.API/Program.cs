@@ -50,6 +50,7 @@ namespace Todo.API
                 app.UseSwaggerUI();
             }
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
