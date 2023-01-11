@@ -71,6 +71,7 @@ namespace Todo.API.Controllers
         }
 
 
+        [Authorize(Roles ="admin")]
         [HttpPost]
         public IActionResult Create(TodoCreateModel model)
         {
@@ -90,6 +91,7 @@ namespace Todo.API.Controllers
             return Created("", item);   // status code : 201
         }
 
+        [Authorize(Roles = "admin")]
         // PUT : /Todo/Edit/{id}
         [HttpPut("{id}")]
         public IActionResult Edit([FromRoute] int id, [FromBody] TodoUpdateModel model)
@@ -110,6 +112,7 @@ namespace Todo.API.Controllers
             return Ok(item);    // status code : 200
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public IActionResult Remove([FromRoute] int id)
         {

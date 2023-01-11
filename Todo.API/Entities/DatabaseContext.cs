@@ -9,6 +9,8 @@ namespace Todo.API.Entities
 
         public DatabaseContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {
+            _configuration = configuration;
+
             if (Database.CanConnect())
             {
                 if (Todos.Any() == false)
@@ -32,10 +34,21 @@ namespace Todo.API.Entities
 
                 if (Users.Any() == false)
                 {
+                    string adminUid = _configuration.GetValue<string>("Authentication:AdminUsername");
+                    string adminPwd = _configuration.GetValue<string>("Authentication:AdminPassword");
 
+                    User user = new User
+                    {
+                        Username = adminUid,
+                        Password = adminPwd,
+                        Role = "admin"
+                    };
+
+                    Users.Add(user);
+                    SaveChanges();
                 }
             }
-            _configuration = configuration;
+            
         }
 
         public DbSet<TodoItem> Todos { get; set; }
