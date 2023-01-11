@@ -5,7 +5,9 @@ namespace Todo.API.Entities
 {
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext(DbContextOptions options) : base(options)
+        private IConfiguration _configuration;
+
+        public DatabaseContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {
             if (Database.CanConnect())
             {
@@ -27,7 +29,13 @@ namespace Todo.API.Entities
                     SaveChanges();
 
                 }
+
+                if (Users.Any() == false)
+                {
+
+                }
             }
+            _configuration = configuration;
         }
 
         public DbSet<TodoItem> Todos { get; set; }
