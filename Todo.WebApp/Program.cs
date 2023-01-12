@@ -1,3 +1,5 @@
+using Todo.WebApp.Managers;
+
 namespace Todo.WebApp
 {
     public class Program
@@ -8,6 +10,8 @@ namespace Todo.WebApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<ITodoService,TodoService>();
 
             var app = builder.Build();
 

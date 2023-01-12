@@ -3,21 +3,27 @@ using RestSharp;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using Todo.WebApp.Managers;
 using Todo.WebApp.Models;
 
 namespace Todo.WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        RestClient client = new RestClient("http://localhost:5086");
+        private ITodoService _todoService;
+
+        public HomeController(ITodoService todoService)
+        {
+            _todoService = todoService;
+        }
 
         public IActionResult Index()
         {
-            RestRequest request = new RestRequest("/Todo/List", Method.Get);
+            //RestRequest request = new RestRequest("/Todo/List", Method.Get);
 
-            List<Models.Todo> todos = client.Get<List<Models.Todo>>(request);
+            //List<Models.Todo> todos = client.Get<List<Models.Todo>>(request);
 
-            return View(todos);
+            return View(_todoService.List());
         }
 
         public IActionResult Create()
@@ -30,14 +36,15 @@ namespace Todo.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                RestRequest request = new RestRequest("/Todo/Create", Method.Post);
-                request.AddJsonBody(model);
+                //RestRequest request = new RestRequest("/Todo/Create", Method.Post);
+                //request.AddJsonBody(model);
 
-                RestResponse<Models.Todo> response = client.ExecutePost<Models.Todo>(request);
-                //Models.Todo todo = client.Post<Models.Todo>(request);
+                //RestResponse<Models.Todo> response = client.ExecutePost<Models.Todo>(request);
+                ////Models.Todo todo = client.Post<Models.Todo>(request);
 
-                Models.Todo todo = response.Data;
+                //Models.Todo todo = response.Data;
 
+                RestResponse<Models.Todo> response = _todoService.Create(model);
                 if (response.StatusCode != HttpStatusCode.Created)
                 {
                     ModelState.AddModelError("", "Servis erişim hatası.");
@@ -54,9 +61,10 @@ namespace Todo.WebApp.Controllers
 
         public IActionResult Edit(int id)
         {
-            RestRequest request = new RestRequest($"/Todo/GetById/{id}", Method.Get);
-            RestResponse<Models.Todo> response = client.ExecuteGet<Models.Todo>(request);
+            //RestRequest request = new RestRequest($"/Todo/GetById/{id}", Method.Get);
+            //RestResponse<Models.Todo> response = client.ExecuteGet<Models.Todo>(request);
 
+            RestResponse<Models.Todo> response = _todoService.GetById(id);
             if (response.IsSuccessful == false)
             {
                 return RedirectToAction(nameof(Index));
@@ -70,11 +78,12 @@ namespace Todo.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                RestRequest request = new RestRequest($"/Todo/Edit/{id}", Method.Put);
-                request.AddJsonBody(model);
+                //RestRequest request = new RestRequest($"/Todo/Edit/{id}", Method.Put);
+                //request.AddJsonBody(model);
 
-                RestResponse<Models.Todo> response = client.ExecutePut<Models.Todo>(request);
+                //RestResponse<Models.Todo> response = client.ExecutePut<Models.Todo>(request);
 
+                RestResponse<Models.Todo> response = _todoService.Update(id, model);
                 if (response.IsSuccessful)
                 {
                     return RedirectToAction(nameof(Index));
@@ -90,9 +99,10 @@ namespace Todo.WebApp.Controllers
 
         public IActionResult Delete(int id)
         {
-            RestRequest request = new RestRequest($"/Todo/Remove/{id}", Method.Delete);
-            RestResponse response = client.Execute(request);
+            //RestRequest request = new RestRequest($"/Todo/Remove/{id}", Method.Delete);
+            //RestResponse response = client.Execute(request);
 
+            RestResponse response =_todoService.Delete(id);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 TempData["result"] = "Kayıt bulunamadı.";
@@ -105,6 +115,21 @@ namespace Todo.WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(SignInModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+            }
+
+            return View(model);
+        }
 
         public IActionResult Privacy()
         {
