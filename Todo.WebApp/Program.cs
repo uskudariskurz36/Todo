@@ -10,8 +10,14 @@ namespace Todo.WebApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddScoped<ITodoService,TodoService>();
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.Name = "todo.webapp.session";
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
+            });
 
             var app = builder.Build();
 
@@ -20,10 +26,10 @@ namespace Todo.WebApp
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.MapControllerRoute(

@@ -1,4 +1,5 @@
-﻿using Todo.WebApp.Managers.Abstract;
+﻿using RestSharp;
+using Todo.WebApp.Managers.Abstract;
 using Todo.WebApp.Models;
 
 namespace Todo.WebApp.Managers
@@ -11,15 +12,14 @@ namespace Todo.WebApp.Managers
         //RestResponse<Models.Todo> GetById(int id);
         //List<Models.Todo> List();
         //RestResponse<Models.Todo> Update(int id, Models.Todo model);
+
+        RestResponse<string> Authenticate(SignInModel model);
     }
 
     public class TodoService : ServiceBase<Models.Todo, TodoCreate, Models.Todo>, ITodoService
     {
-        private IConfiguration _configuration;
-
-        public TodoService(IConfiguration configuration) : base(configuration)
+        public TodoService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base(configuration, httpContextAccessor)
         {
-            _configuration = configuration;
         }
 
         public override void SetEndPoints()
@@ -30,6 +30,14 @@ namespace Todo.WebApp.Managers
             _editEndpoint = "/Todo/Edit";
             _getByIdEndpoint = "/Todo/GetById";
             _deleteEndpoint = "/Todo/Remove";
+        }
+
+        public RestResponse<string> Authenticate(SignInModel model)
+        {
+            RestRequest request = new RestRequest("/Account/SignIn", Method.Post);
+            request.AddJsonBody(model);
+
+            return _client.ExecutePost<string>(request);
         }
 
         //private RestClient _client;

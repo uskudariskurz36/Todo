@@ -3,6 +3,7 @@ using RestSharp;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using Todo.WebApp.Filters;
 using Todo.WebApp.Managers;
 using Todo.WebApp.Models;
 
@@ -17,20 +18,31 @@ namespace Todo.WebApp.Controllers
             _todoService = todoService;
         }
 
+        [AuthFilter]
         public IActionResult Index()
         {
             //RestRequest request = new RestRequest("/Todo/List", Method.Get);
 
             //List<Models.Todo> todos = client.Get<List<Models.Todo>>(request);
 
-            return View(_todoService.List());
+            RestResponse<List<Models.Todo>> response = _todoService.List();
+
+            if (response.IsSuccessful)
+            {
+                return View(response.Data);
+            }
+
+            HttpContext.Session.Clear();
+            return RedirectToAction(nameof(Login));
         }
 
+        [AuthFilter]
         public IActionResult Create()
         {
             return View();
         }
 
+        [AuthFilter]
         [HttpPost]
         public IActionResult Create(TodoCreate model)
         {
@@ -59,6 +71,7 @@ namespace Todo.WebApp.Controllers
             return View(model);
         }
 
+        [AuthFilter]
         public IActionResult Edit(int id)
         {
             //RestRequest request = new RestRequest($"/Todo/GetById/{id}", Method.Get);
@@ -73,6 +86,7 @@ namespace Todo.WebApp.Controllers
             return View(response.Data);
         }
 
+        [AuthFilter]
         [HttpPost]
         public IActionResult Edit(int id, Models.Todo model)
         {
@@ -97,6 +111,7 @@ namespace Todo.WebApp.Controllers
             return View(model);
         }
 
+        [AuthFilter]
         public IActionResult Delete(int id)
         {
             //RestRequest request = new RestRequest($"/Todo/Remove/{id}", Method.Delete);
@@ -125,10 +140,36 @@ namespace Todo.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                // gelen modeldeki bilgiler ile aPI ye istek yapılır ve token alınmaya çalışılır.
+                RestResponse<string> response = _todoService.Authenticate(model);
 
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    ModelState.AddModelError("", "Kullanıcı adı ya da şifre hatalı.");
+                }
+                else
+                {
+                    if (response.IsSuccessful)
+                    {
+                        string token = response.Data;
+                        HttpContext.Session.SetString("token", token);
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "API Servisi hatası.");
+                    }
+                }
             }
 
             return View(model);
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction(nameof(Login));
         }
 
         public IActionResult Privacy()

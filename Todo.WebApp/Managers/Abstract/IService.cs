@@ -8,7 +8,7 @@ namespace Todo.WebApp.Managers.Abstract
         RestResponse<T> Create(TCreate model);
         RestResponse Delete(int id);
         RestResponse<T> GetById(int id);
-        List<T> List();
+        RestResponse<List<T>> List();
         RestResponse<T> Update(int id, TEdit model);
     }
 }

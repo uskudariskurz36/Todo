@@ -1,5 +1,6 @@
 ﻿
 using RestSharp;
+using RestSharp.Authenticators;
 
 namespace Todo.WebApp.Managers.Abstract
 {
@@ -8,8 +9,8 @@ namespace Todo.WebApp.Managers.Abstract
         where TEdit : class, new()
         where TCreate : class, new()
     {
-        private RestClient _client;
-        private IConfiguration _configuration;
+        protected RestClient _client;
+        protected IConfiguration _configuration;
 
         protected string _endpoint;
         protected string _listEndpoint;
@@ -20,17 +21,28 @@ namespace Todo.WebApp.Managers.Abstract
 
         public abstract void SetEndPoints();
 
-        public ServiceBase(IConfiguration configuration)
+        public ServiceBase(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
+            
             SetEndPoints();
             _client = new RestClient(_endpoint);
+
+            //string token = httpContextAccessor.HttpContext.Session.GetString("token") 
+            //    ?? throw new Exception("Auth token bulunamadı.");
+
+            string token = httpContextAccessor.HttpContext.Session.GetString("token") ?? "";
+
+            if (string.IsNullOrEmpty(token) == false)
+            {
+                _client.Authenticator = new JwtAuthenticator(token);
+            }
         }
 
-        public List<T> List()
+        public RestResponse<List<T>> List()
         {
             RestRequest request = new RestRequest(_listEndpoint, Method.Get);
-            return _client.Get<List<T>>(request);
+            return _client.ExecuteGet<List<T>>(request);
         }
 
         public RestResponse<T> Create(TCreate model)
